@@ -1,0 +1,15 @@
+# Secretos y entorno
+.env
+.venv/
+venv/
+
+# Python / Django
+__pycache__/
+*.pyc
+db.sqlite3
+staticfiles/
+
+# Editor / SO
+.vscode/
+.idea/
+.DS_Store

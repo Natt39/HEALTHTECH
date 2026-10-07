@@ -1,0 +1,43 @@
+# Blueprint de Render: crea la base PostgreSQL y el servicio web de la API.
+# Uso: Render -> New -> Blueprint -> elige este repositorio.
+services:
+  - type: web
+    name: healthtech
+    runtime: python
+    rootDir: healthtech-django
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: gunicorn core.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: healthtech-db
+          property: connectionString
+      # Origen(es) del frontend, SIN "/" final ni ruta. Varios: separados por coma.
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://natt39.github.io
+      - key: NUM_PROXIES
+        value: "1"
+      - key: GEMINI_API_KEY
+        sync: false          # se pega a mano en el panel de Render
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash
+      # Opcional: para entrar a /admin y asignar el rol "médico"
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
+
+databases:
+  - name: healthtech-db
+    plan: free
+    databaseName: healthtech
+    user: healthtech
