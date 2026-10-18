@@ -16,6 +16,8 @@ ESQUEMA_RECETA = {
     'properties': {
         'inr_actual': {'type': ['string', 'null']},
         'rango_terapeutico': {'type': ['string', 'null']},
+        'medico': {'type': ['string', 'null']},
+        'fecha_control': {'type': ['string', 'null']},
         'medicamentos': {
             'type': 'array',
             'items': {
@@ -32,12 +34,18 @@ ESQUEMA_RECETA = {
             },
         },
     },
-    'required': ['inr_actual', 'rango_terapeutico', 'medicamentos'],
+    'required': ['inr_actual', 'rango_terapeutico', 'medico', 'fecha_control', 'medicamentos'],
 }
 
 INSTRUCCIONES_RECETA = '''
 Lee solamente lo que se distingue en esta hoja de dosificación TACO.
 Extrae literalmente el INR y el rango terapéutico; si no son legibles escribe null.
+Extrae el nombre completo del médico o profesional que firma la receta
+(busca cerca de la firma, el timbre o un campo "Médico"/"Dr."/"Dra.");
+si no aparece claramente escribe null.
+Extrae la fecha del próximo control (puede decir "Próximo control", "Control",
+"Próxima hora" o similar) y devuélvela en formato AAAA-MM-DD; si el año no aparece
+asume el año actual; si no se distingue escribe null.
 Extrae nombre del medicamento y gramaje solo si aparecen claramente.
 Copia la dosis EXACTAMENTE como aparece para lunes a domingo,
 incluyendo fracciones como 1+1/4 o 1+1/2. Si alguna dosis no se distingue, escribe null.
