@@ -147,7 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [o.rstrip('/') for o in env_list(
     'CORS_ALLOWED_ORIGINS',
     'https://natt39.github.io,http://localhost:5500,http://127.0.0.1:5500,'
-    'http://localhost:3000,http://127.0.0.1:3000',
+    'http://localhost:3000,http://127.0.0.1:3000,https://localhost',
 )]
 # La API usa JWT en la cabecera Authorization (no cookies): no hace falta CORS con credenciales.
 CORS_ALLOW_CREDENTIALS = False
