@@ -12,11 +12,21 @@
 <style>
 /* --- Intro: pantalla completa, solo el video, fondo negro --- */
 #splash-screen{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;background:#000;display:flex;justify-content:center;align-items:center;z-index:99999}
-#intro-video{width:100%;height:100%;object-fit:cover;background:#000}
+#intro-video{width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;background:#000}
 body.intro-activa{background:#000!important;overflow:hidden}
 body.intro-activa>*:not(#splash-screen){display:none!important}
 </style>
-</head> 
+<style>
+.gauge-inr{width:84px;height:84px;flex:none}.gauge-inr circle{fill:none;stroke-width:9}.gauge-inr .gauge-bg{stroke:#eaf2ee}.gauge-inr .gauge-fg{stroke:var(--verde-primario);stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dasharray .6s ease}
+.progreso-card{border-left:5px solid transparent;transition:border-color .3s}
+.progreso-card.inr-verde{border-left-color:#00CC9F}
+.progreso-card.inr-amarillo{border-left-color:#F2B705}
+.progreso-card.inr-rojo{border-left-color:var(--rojo-alerta)}
+.clima-actual{display:flex;align-items:center;gap:14px}.clima-icono-grande svg{width:48px;height:48px}.clima-temp-grande{font-size:28px;margin:0;color:var(--verde-oscuro);font-weight:500}.clima-sub{margin:2px 0 0;font-size:12px;color:var(--gris-texto)}.clima-pronostico{display:flex;gap:6px;margin-top:12px;overflow-x:auto}.clima-dia{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--gris-texto);min-width:34px}.clima-dia svg{width:22px;height:22px}.clima-dia strong{font-size:11px;color:#16221e}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.cal-nav button{padding:4px 10px;flex:none;width:auto}
+.calendario-dia{min-width:0}
+</style>
+</head>
 <body>
    <div id="splash-screen" class="hidden">
   <video id="intro-video" muted playsinline preload="auto">
@@ -34,10 +44,10 @@ body.intro-activa>*:not(#splash-screen){display:none!important}
 <section id="vistaPanel" class="hidden dashboard" aria-label="Panel del paciente"><header class="dashboard-header"><div class="brand"><img src="logo_HealthTech_TACO.jpeg" alt="HealthTech TACO"></div><nav class="dashboard-nav" aria-label="Secciones del panel"><a href="#vistaPanel">Inicio</a><a href="#seccionCitas">Citas</a><a href="#seccionReporte">Reporte</a><a href="#seccionTratamiento">Tratamiento</a><a href="#seccionMedicamentos">Medicamentos</a></nav><div class="perfil-usuario"><div class="avatar" aria-hidden="true">HT</div><div><strong id="nombreUsuarioPanel">Paciente</strong><small>Mi espacio</small></div><button id="btnSalir" class="btn-salir" type="button">Salir</button></div></header>
 <div class="dashboard-intro"><div><h1>Bienvenido, <span id="nombrePaciente">Paciente</span></h1><p>Aquí tienes un resumen de tu espacio de salud.</p></div><div class="indicadores"><div class="indicador"><div class="indicador-icono">♡</div><div><strong>—</strong><span>Frecuencia cardíaca</span></div></div><div class="indicador"><div class="indicador-icono">◌</div><div><strong>—</strong><span>Presión arterial</span></div></div><div class="indicador"><div class="indicador-icono">▣</div><div><strong>—</strong><span>Sesiones VR</span></div></div></div></div>
 <div class="dashboard-grid">
-<article id="seccionCitas" class="dashboard-card citas-card"><div class="card-heading"><h2>▦ Próximas citas</h2><span class="muted">Agenda</span></div><div class="calendario" id="calendarioPanel"></div><p class="muted">Aún no hay citas conectadas a tu cuenta.</p><div class="cita-fila"><time>—</time><div><strong>Próxima consulta</strong><small>Sin información disponible</small></div></div></article>
-<article class="dashboard-card progreso-card"><div class="card-heading"><h2>♡ Datos de salud</h2><span class="muted">Registros guardados</span></div><div class="progreso-principal"><div><div class="progreso-numero" id="ultimoINRPanel">—</div><span class="muted">Último INR confirmado</span></div><div class="sin-datos">Rango registrado: <span id="ultimoRangoPanel">—</span><br>Oxígeno y temperatura: sin mediciones conectadas</div></div><div class="progreso-linea" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p class="nota-demo">Barras decorativas: no representan mediciones ni una evaluación clínica.</p></article>
+<article id="seccionCitas" class="dashboard-card citas-card"><div class="card-heading"><h2>▦ Próximas citas</h2><span class="muted">Agenda</span></div><div class="cal-nav"><button type="button" id="mesAnterior" class="btn-social">‹</button><strong id="tituloMesCalendario" class="muted">—</strong><button type="button" id="mesSiguiente" class="btn-social">›</button></div><div class="calendario" id="calendarioPanel"></div><div id="detalleProximoControl"><div class="cita-fila"><time>—</time><div><strong id="proximaConsultaTexto">Próxima consulta</strong><small id="medicoTratante">Sin información disponible</small></div></div></div></article>
+<article id="tarjetaIndicadorINR" class="dashboard-card progreso-card"><div class="card-heading"><h2>♡ Datos de salud</h2><span class="muted">Registros guardados</span></div><div class="progreso-principal"><svg class="gauge-inr" viewBox="0 0 120 120" aria-hidden="true"><circle class="gauge-bg" cx="60" cy="60" r="52"/><circle class="gauge-fg" id="gaugeINRCirculo" cx="60" cy="60" r="52" stroke-dasharray="0 326.7"/></svg><div><div class="progreso-numero" id="ultimoINRPanel">—</div><span class="muted">Último INR confirmado</span></div><div class="sin-datos">Rango registrado: <span id="ultimoRangoPanel">—</span><br>Oxígeno y temperatura: sin mediciones conectadas</div></div><div class="progreso-linea" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p class="nota-demo">Barras decorativas: no representan mediciones ni una evaluación clínica.</p></article>
 <article id="seccionTratamiento" class="dashboard-card tratamiento-card"><div class="card-heading"><h2>⌛ Plan de tratamiento</h2></div><strong class="plan-numero" id="totalMedicamentos">—</strong><span class="muted">medicamentos guardados</span><div class="plan-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div><p class="nota-demo" style="color:#e5fff7">Barras decorativas; consulta tu dosis en la lista.</p></article>
-<article class="dashboard-card video-card"><div class="video-ilustracion" aria-hidden="true">✚</div><div><h2 style="text-align:left;font-size:16px">Apoyo profesional</h2><p class="muted">La videollamada no está conectada todavía.</p></div></article>
+<article class="dashboard-card video-card"><div class="card-heading"><h2>☁ Clima</h2><span class="muted" id="climaCiudadNombre">—</span></div><div id="climaContenido"><p class="muted">Obteniendo tu ubicación…</p></div></article>
 <article id="seccionReporte" class="dashboard-card reporte-card"><div class="card-heading"><h2>⌁ Reporte INR</h2><span class="muted">Lecturas guardadas</span></div><p class="reporte-resumen" id="reporteResumen">Cargando lecturas...</p><div id="graficoINRVacio" class="reporte-vacio">No hay lecturas INR confirmadas.</div><svg id="graficoINR" class="reporte-grafico hidden" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="Evolución de los últimos valores INR guardados"><path id="graficoINRArea" d=""/><polyline id="graficoINRLinea" points=""/><g id="graficoINRPuntos"></g></svg><div id="graficoINRFechas" class="meses"></div><p class="nota-demo">Gráfico de lecturas transcritas y confirmadas; no es evaluación clínica.</p></article>
 <article id="seccionMedicamentos" class="dashboard-card medicina-card"><div class="card-heading"><h2>▣ Medicamentos</h2></div><div class="med-resumen"><strong id="totalMedicamentosResumen">—</strong><span class="muted">registrados en tu cuenta</span></div><a href="#herramientaMedicamentos">Ver y agregar medicamentos ↓</a></article>
 </div><div class="herramientas"><section class="herramienta" id="herramientaReceta"><h2>Escáner de recetas</h2><form id="formReceta"><div class="input-group"><input type="file" id="inputImagen" accept="image/*" required aria-label="Foto de la receta"></div><button type="submit" class="btn-primary">Escanear receta con IA</button></form><p id="mensajeReceta" role="status" aria-live="polite"></p><div id="resultadoAlerta" class="hidden"><strong class="resultado-estado"></strong><br><span class="resultado-detalle"></span></div><p class="muted">La lectura de IA puede equivocarse. Comprueba INR y rango con el documento original.</p><button id="btnGuardarINR" type="button" class="btn-primary" disabled>Confirmar y guardar INR leído</button><p id="mensajeGuardarINR" role="status" aria-live="polite"></p></section>
@@ -57,6 +67,13 @@ body.intro-activa>*:not(#splash-screen){display:none!important}
           <h2>Identificación QR</h2>
           <button id="btnGenerarQR" type="button" class="btn-primary">Generar QR de emergencia</button>
           <div id="qrcode-container" style="margin-top: 15px; display: flex; justify-content: center;"></div>
+        </section>
+
+        <section class="herramienta">
+          <h2>Compartir ubicación</h2>
+          <p>Envía tu ubicación actual a un contacto de confianza en caso de emergencia.</p>
+          <button id="btnCompartirUbicacion" type="button" class="btn-primary">Compartir mi ubicación</button>
+          <p id="mensajeUbicacion" role="status" aria-live="polite"></p>
         </section>
       </div>
     </section>
